@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Pytest / test caches
+.pytest_cache/
+.cache/
+
+# Environment / secrets (NEVER commit real secrets)
+.env
+.env.local
+*.pem
+*.key
+
+# Playwright
+test-results/
+playwright-report/
+playwright/.auth/
+
+# Allure generated reports (results are runtime artifacts too)
+reports/allure-report/
+reports/allure-results/
+reports/.live/
+reports/.last_run/
+reports/execution-history/
+reports/screenshots/
+reports/videos/
+reports/traces/
+reports/framework-report.html
+!reports/.gitkeep
+
+# Logs
+logs/*.log
+!logs/.gitkeep
+
+# Runtime / packaging output
+dist/
+*.zip
+*.tar.gz
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+reports/.last_failed.json

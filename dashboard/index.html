@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unified Automation Framework - Dashboard</title>
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<header class="app-header">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true">&#9670;</span>
+    <div>
+      <h1>Unified Automation Framework</h1>
+      <p class="subtitle">API &bull; UI &bull; API+UI &bull; End-to-End &mdash; one dashboard, one engine</p>
+    </div>
+  </div>
+  <div class="header-meta">
+    <span id="versionBadge" class="badge" title="Framework version">v?</span>
+    <button id="themeToggle" type="button" class="btn btn-ghost" aria-label="Toggle dark/light theme">&#9788; Theme</button>
+  </div>
+</header>
+
+<main id="main" class="container">
+
+  <!-- Configuration -->
+  <section class="card" aria-labelledby="configHeading">
+    <h2 id="configHeading">Execution configuration</h2>
+    <div class="config-grid">
+      <div class="field">
+        <label for="browserSelect">Browser</label>
+        <select id="browserSelect">
+          <option value="chromium">Chromium</option>
+          <option value="firefox">Firefox</option>
+          <option value="webkit">WebKit</option>
+        </select>
+      </div>
+      <fieldset class="field">
+        <legend>Browser mode</legend>
+        <label class="radio"><input type="radio" name="headlessMode" value="headless" checked> Headless</label>
+        <label class="radio"><input type="radio" name="headlessMode" value="headed"> Headed</label>
+      </fieldset>
+      <div class="field">
+        <label for="envSelect">Environment</label>
+        <select id="envSelect"></select>
+      </div>
+      <div class="field">
+        <label for="deviceInput">Device <span class="hint">(optional, e.g. iPhone 13)</span></label>
+        <input id="deviceInput" type="text" placeholder="default viewport" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="workersSelect">Parallel workers</label>
+        <select id="workersSelect">
+          <option value="0">Serial (1)</option>
+          <option value="2">2</option>
+          <option value="4">4</option>
+          <option value="auto">auto (all CPUs)</option>
+        </select>
+      </div>
+    </div>
+    <div id="envInfo" class="env-info" aria-live="polite"></div>
+  </section>
+
+  <!-- Controls -->
+  <section class="card" aria-labelledby="controlsHeading">
+    <h2 id="controlsHeading">Execution controls</h2>
+    <div class="btn-row" role="toolbar" aria-label="Execution controls">
+      <button id="btnRunSelected" type="button" class="btn btn-primary">Run Selected (<span id="selectedCount">0</span>)</button>
+      <button id="btnRunAll" type="button" class="btn">Run All</button>
+      <button id="btnRunSmoke" type="button" class="btn">Run Smoke</button>
+      <button id="btnRunRegression" type="button" class="btn">Run Regression</button>
+      <button id="btnRerunFailed" type="button" class="btn btn-warn">Rerun Failed</button>
+      <button id="btnRerunAll" type="button" class="btn">Rerun All</button>
+      <button id="btnStop" type="button" class="btn btn-danger" disabled>Stop Execution</button>
+    </div>
+    <div class="btn-row" role="toolbar" aria-label="Utility controls">
+      <button id="btnRefreshTests" type="button" class="btn btn-ghost">Refresh Tests</button>
+      <button id="btnClearSelection" type="button" class="btn btn-ghost">Clear Selection</button>
+      <button id="btnCopyCommand" type="button" class="btn btn-ghost">Copy Command</button>
+      <button id="btnAllure" type="button" class="btn btn-ghost">Open Allure Report</button>
+      <button id="btnRefreshResults" type="button" class="btn btn-ghost">Refresh Results</button>
+      <button id="btnLogs" type="button" class="btn btn-ghost">Open Logs</button>
+      <button id="btnClearResults" type="button" class="btn btn-ghost">Clear Old Results</button>
+      <button id="btnDlComplete" type="button" class="btn btn-ghost">Download Complete Framework</button>
+      <button id="btnDlNoExamples" type="button" class="btn btn-ghost">Download Framework Without Example Tests</button>
+    </div>
+    <div id="actionMessage" class="action-message" aria-live="polite"></div>
+  </section>
+
+  <!-- Tabs -->
+  <div class="tabs" role="tablist" aria-label="Test categories">
+    <button id="tab-api" role="tab" aria-selected="true" aria-controls="panel-tests" data-category="api">API Tests (<span id="count-api">0</span>)</button>
+    <button id="tab-ui" role="tab" aria-selected="false" aria-controls="panel-tests" data-category="ui">UI Tests (<span id="count-ui">0</span>)</button>
+    <button id="tab-api_ui" role="tab" aria-selected="false" aria-controls="panel-tests" data-category="api_ui">API + UI Tests (<span id="count-api_ui">0</span>)</button>
+    <button id="tab-e2e" role="tab" aria-selected="false" aria-controls="panel-tests" data-category="e2e">End-to-End Tests (<span id="count-e2e">0</span>)</button>
+    <button id="tab-docs" role="tab" aria-selected="false" aria-controls="panel-docs" data-category="docs">Documentation / Help</button>
+  </div>
+
+  <!-- Test selection panel -->
+  <section id="panel-tests" class="card" role="tabpanel" aria-labelledby="tab-api">
+    <div class="panel-toolbar">
+      <div class="search-box">
+        <label for="searchInput" class="visually-hidden">Search tests</label>
+        <input id="searchInput" type="search" placeholder="Search by name, file, class, node id, marker..." autocomplete="off">
+        <button id="btnClearSearch" type="button" class="btn btn-ghost btn-sm">Clear</button>
+      </div>
+      <span id="searchCount" class="search-count" aria-live="polite"></span>
+    </div>
+    <div class="panel-toolbar">
+      <div class="btn-row">
+        <button id="btnExpandAll" type="button" class="btn btn-ghost btn-sm">Expand All</button>
+        <button id="btnCollapseAll" type="button" class="btn btn-ghost btn-sm">Collapse All</button>
+        <button id="btnSelectCategory" type="button" class="btn btn-ghost btn-sm">Select Category</button>
+        <button id="btnDeselectCategory" type="button" class="btn btn-ghost btn-sm">Deselect Category</button>
+      </div>
+      <label class="select-all"><input id="categoryToggle" type="checkbox"> Select all in this tab</label>
+    </div>
+    <div id="testTree" class="test-tree" aria-live="polite">
+      <p class="muted">Loading tests...</p>
+    </div>
+  </section>
+
+  <!-- Docs panel -->
+  <section id="panel-docs" class="card hidden" role="tabpanel" aria-labelledby="tab-docs">
+    <div class="docs-layout">
+      <aside class="docs-side">
+        <label for="docsSearch" class="visually-hidden">Search documentation</label>
+        <input id="docsSearch" type="search" placeholder="Search documentation..." autocomplete="off">
+        <nav id="docsToc" aria-label="Documentation contents"><p class="muted">Loading...</p></nav>
+      </aside>
+      <article id="docsContent" class="docs-content"><p class="muted">Loading documentation...</p></article>
+    </div>
+  </section>
+
+  <!-- Live execution -->
+  <section class="card" aria-labelledby="liveHeading">
+    <h2 id="liveHeading">Live execution</h2>
+    <div id="liveEmpty" class="muted">No execution running. Select tests and press <strong>Run Selected</strong>.</div>
+    <div id="liveArea" class="hidden">
+      <div class="live-grid">
+        <div><span class="label">Status</span><span id="liveStatus" class="status-pill">running</span></div>
+        <div><span class="label">Run</span><span id="liveRunId" class="mono"></span></div>
+        <div><span class="label">Browser</span><span id="liveBrowser"></span></div>
+        <div><span class="label">Mode</span><span id="liveMode"></span></div>
+        <div><span class="label">Environment</span><span id="liveEnv"></span></div>
+        <div><span class="label">Progress</span><span id="liveProgress" class="mono"></span></div>
+        <div><span class="label">Passed</span><span id="livePassed" class="mono ok-text"></span></div>
+        <div><span class="label">Failed</span><span id="liveFailed" class="mono fail-text"></span></div>
+        <div><span class="label">Skipped</span><span id="liveSkipped" class="mono"></span></div>
+        <div><span class="label">Errors</span><span id="liveErrors" class="mono fail-text"></span></div>
+        <div><span class="label">Elapsed</span><span id="liveElapsed" class="mono"></span></div>
+        <div><span class="label">Command</span><span id="liveCommand" class="mono small"></span></div>
+      </div>
+      <div class="progress" role="progressbar" aria-label="Execution progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBarWrap">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+      <div><span class="label">Currently running</span>
+        <ul id="liveRunning" class="mono small"></ul>
+      </div>
+      <details class="log-details">
+        <summary>Runner output (live tail)</summary>
+        <pre id="liveLog" class="log-output" aria-live="off"></pre>
+      </details>
+    </div>
+  </section>
+
+  <!-- Suite summary -->
+  <section class="card hidden" id="summarySection" aria-labelledby="summaryHeading">
+    <h2 id="summaryHeading">Suite summary</h2>
+    <div id="summaryGrid" class="live-grid"></div>
+  </section>
+
+  <!-- Failed tests -->
+  <section class="card hidden" id="failedSection" aria-labelledby="failedHeading">
+    <h2 id="failedHeading">Failed tests (<span id="failedCount">0</span>)</h2>
+    <div class="btn-row">
+      <button id="btnRerunFailed2" type="button" class="btn btn-warn btn-sm">Rerun Failed</button>
+      <button id="btnCopyFailed" type="button" class="btn btn-ghost btn-sm">Copy Failed Test Names</button>
+    </div>
+    <ul id="failedList" class="failed-list"></ul>
+  </section>
+
+  <!-- Results -->
+  <section class="card" aria-labelledby="resultsHeading">
+    <h2 id="resultsHeading">Results <span id="resultsRunId" class="muted small"></span></h2>
+    <div id="resultsEmpty" class="muted">No results yet.</div>
+    <div class="table-wrap hidden" id="resultsWrap">
+      <table class="results-table">
+        <thead><tr>
+          <th scope="col">Test</th><th scope="col">Category</th><th scope="col">Status</th>
+          <th scope="col">Duration</th><th scope="col">Start</th><th scope="col">End</th>
+          <th scope="col">Failure</th><th scope="col">Artifacts</th>
+        </tr></thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- History -->
+  <section class="card" aria-labelledby="historyHeading">
+    <h2 id="historyHeading">Execution history</h2>
+    <div class="btn-row">
+      <button id="btnRefreshHistory" type="button" class="btn btn-ghost btn-sm">Refresh History</button>
+    </div>
+    <div id="historyEmpty" class="muted">No previous runs recorded.</div>
+    <div class="table-wrap hidden" id="historyWrap">
+      <table class="results-table">
+        <thead><tr>
+          <th scope="col">Run ID</th><th scope="col">Date</th><th scope="col">Status</th>
+          <th scope="col">Duration</th><th scope="col">Total</th><th scope="col">Passed</th>
+          <th scope="col">Failed</th><th scope="col">Skipped</th><th scope="col">Env</th>
+          <th scope="col">Browser</th><th scope="col">Mode</th><th scope="col"></th>
+        </tr></thead>
+        <tbody id="historyBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <span id="footerVersions" class="muted small"></span>
+  </footer>
+</main>
+
+<!-- Logs modal -->
+<div id="logsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="logsTitle">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2 id="logsTitle">Framework logs</h2>
+      <button id="btnCloseLogs" type="button" class="btn btn-ghost btn-sm">Close</button>
+    </div>
+    <div class="btn-row">
+      <label for="logFileSelect">File</label>
+      <select id="logFileSelect"></select>
+      <button id="btnReloadLog" type="button" class="btn btn-ghost btn-sm">Reload</button>
+    </div>
+    <pre id="logContent" class="log-output log-modal-output"></pre>
+  </div>
+</div>
+
+<!-- Artifacts modal -->
+<div id="artModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="artTitle">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2 id="artTitle">Test artifacts</h2>
+      <button id="btnCloseArt" type="button" class="btn btn-ghost btn-sm">Close</button>
+    </div>
+    <div id="artBody"></div>
+  </div>
+</div>
+
+<script src="/js/app.js"></script>
+</body>
+</html>
